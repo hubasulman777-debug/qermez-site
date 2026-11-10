@@ -415,10 +415,10 @@ body[data-view="painted"] .hero, body[data-view="painted"] .idea, body[data-view
 <script>
 // ===== PAINTED BAGS: edit these four (add or delete blocks as you like) =====
 const PAINTED = [
-{ photo:"painted-1.jpg", name:"Naqsh Tote", line:"A line about this painting goes here.", price:1800 },
-  { photo:"painted-2.jpg", name:"Wahda Tote", line:"A line about this painting goes here.", price:1200 },
-  { photo:"painted-3.jpg", name:"Zan Tote", line:"A line about this painting goes here.", price:1200 },
-  { photo:"painted-6.jpg", name:"Rani Tote", line:"A line about this painting goes here.", price:2000 }
+{ photo:"painted-1.jpg", name:"Naqsh Tote", line:"", price:1800 },
+  { photo:"painted-2.jpg", name:"Wahda Tote", line:".", price:1200 },
+  { photo:"painted-3.jpg", name:"Zan Tote", line:"", price:1200 },
+  { photo:"painted-6.jpg", name:"Rani Tote", line:"", price:2000 }
 ];
 document.getElementById("pgrid").innerHTML = PAINTED.map(function (b) {
   return '<article class="pcard">' + (b.photo ? '<img class="pic" src="' + b.photo + '" alt="' + b.name + '">' : '<div class="pic">Photo goes here</div>') + '<p class="kind">Hand painted</p><h3>' + b.name + '</h3><p>' + b.line + '</p><p class="price">PKR ' + b.price.toLocaleString("en-PK") + '</p><p class="made">Made to order. Painted again for you on request.</p><a class="btn" href="' + link("Hi! I’d like the " + b.name + " bag.") + '">Order on WhatsApp</a></article>';
