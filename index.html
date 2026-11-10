@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TheQermez: tote bags you can play with</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,400&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --canvas:#efe3c8; --red:#A3202C; --ink:#000; --green:#2f5d3a; --brass:#b8893b;
+    /* splash colors: change these two to restyle the splash */
+    --splash-bg:#A3202C;
+    --splash-text:#fff8e7
+    ;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--canvas); color:var(--ink); font:18px/1.65 "Fraunces", Georgia, serif; }
+  a { color:inherit; }
+  a:focus-visible, summary:focus-visible, .btn:focus-visible { outline:3px solid var(--brass); outline-offset:3px; }
+  .ur { font-family:"Noto Nastaliq Urdu", serif; line-height:2.1; direction:rtl; }
+  .stitch { position:fixed; left:10px; top:0; bottom:0; border-left:2px dashed var(--red); z-index:30; pointer-events:none; }
+  .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+  /* ===== SPLASH ===== */
+  #splash {
+    position:fixed; inset:0; z-index:9999;
+    background:#efe6cf url('./splash.jpg') center / cover no-repeat; color:var(--splash-text);
+    display:flex; align-items:flex-end; justify-content:center;
+    padding:0 3vw 2vh;
+    opacity:1; transition:opacity .6s ease;
+  }
+  #splash .brand {
+    display:none;
+    font-family:"Cormorant Garamond", Georgia, serif; font-weight:300;
+    font-size:12vw; line-height:.85; letter-spacing:.01em; text-transform:uppercase;
+    white-space:nowrap; width:max-content; text-align:center; margin:0;
+    opacity:0; transition:opacity .25s ease;
+  }
+  #splash .brand.ready { opacity:1; }
+  #splash.hide { opacity:0; pointer-events:none; visibility:hidden; transition:opacity .6s ease, visibility 0s linear .6s; }
+
+  /* ===== NAV ===== */
+  .nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; flex-wrap:nowrap; justify-content:space-between; align-items:center;
+    padding:16px 20px; background:transparent;
+    font-family:'Courier Prime', monospace;
+  }
+  .nav a {
+    text-decoration:none; white-space:nowrap;
+    font-family:'Courier Prime', monospace; font-weight:700;
+    font-size:clamp(11px,1.4vw,16px); letter-spacing:1px; text-transform:uppercase;
+  }
+  .nav .nav-left a { color:#f2e6cd; text-shadow:0 1px 4px rgba(0,0,0,.55); }
+  .nav .nav-right { display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; gap:clamp(10px,2.2vw,28px); }
+  .nav .nav-right a { color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.55); }
+
+  /* ===== HERO: split screen ===== */
+  .hero { display:flex; width:100%; height:100vh; margin:0; gap:0; overflow:hidden; background:#A3202C; }
+  .half { flex:0 0 50%; width:50%; height:100vh; margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 5vw; }
+  .half.left { display:none; }
+  .half.right { flex:0 0 100%; width:100%; background:none; color:#fff; gap:18px; }
+  .half.right p { margin:0; font-size:clamp(26px,4.4vw,60px); line-height:1.1; font-weight:300; text-shadow:0 2px 12px rgba(0,0,0,.35); }
+  .half.right a { font-style:italic; color:#ecc77a; }
+
+  /* ===== the four games ===== */
+  section { padding:84px 6vw; }
+  h2 { font-size:clamp(34px,5vw,64px); line-height:1.05; font-weight:300; margin:0 0 14px; max-width:14ch; }
+  .lede { max-width:46ch; margin:0 0 54px; }
+
+  .games { display:grid; grid-template-columns:repeat(2, 420px); gap:32px; justify-content:center; }
+  @media (min-width:760px) { .game:nth-child(even) { margin-top:64px; } }
+  .art { border:2px solid var(--ink); background:var(--tint); padding:18px; }
+  .art svg { display:block; width:100%; height:auto; }
+  .head { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-top:16px; }
+  h3 { margin:0; font-size:34px; font-weight:600; line-height:1.1; }
+  .head .ur { font-size:26px; color:var(--red); }
+  .theme { margin:6px 0 10px; }
+  .price { font-weight:600; margin:0 0 12px; }
+  details { border-top:2px solid var(--ink); padding:10px 0; }
+  summary { cursor:pointer; font-style:italic; }
+  details[open] .body { animation:open .3s ease; }
+  @keyframes open { from { opacity:0; transform:translateY(-6px); } }
+  .body p { margin:10px 0 0; font-size:16px; }
+  .btn { display:inline-block; margin-top:6px; background:var(--red); color:var(--canvas); padding:11px 22px; text-decoration:none; font-style:italic; border:2px solid var(--red); }
+  .btn:hover { background:var(--ink); border-color:var(--ink); }
+
+  /* shared details */
+  .every { background:var(--ink); color:var(--canvas); }
+  .every h2 { color:var(--canvas); }
+  .items { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:30px; margin-top:34px; }
+  .items div { border-top:2px dashed var(--red); padding-top:14px; }
+  .items b { display:block; font-size:22px; font-weight:600; }
+  .items span { font-size:16px; opacity:.85; }
+
+  /* story */
+  .idea p { font-size:clamp(24px,3.4vw,42px); line-height:1.25; font-weight:300; max-width:28ch; margin:0; }
+  .idea p em { color:var(--red); }
+  footer { background:var(--red); color:var(--canvas); padding:44px 6vw; display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+  footer b { font-size:28px; font-weight:300; }
+  footer a { color:var(--canvas); margin-right:18px; }
+
+  /* subscribe box */
+  .sub { position:fixed; right:20px; bottom:20px; width:min(380px,calc(100vw - 40px)); background:var(--canvas); border:2px dashed var(--red); padding:18px 20px 20px; z-index:40; box-shadow:0 0 0 6px var(--canvas); }
+  .sub b { display:block; font-size:21px; font-weight:600; line-height:1.2; padding-right:28px; }
+  .sub p { margin:6px 0 12px; font-size:15px; }
+  .sub label { display:flex; gap:12px; align-items:baseline; border-top:2px solid var(--ink); padding:8px 0; font-style:italic; font-size:15px; font-family:'Courier Prime', monospace; }
+  .sub input { flex:1; min-width:0; border:0; background:transparent; font:inherit; font-size:16px; outline:none; color:var(--ink); }
+  .sub input:focus-visible { outline:2px solid var(--brass); outline-offset:2px; }
+  .sub input::placeholder { font-family:'Caveat', cursive; font-size:20px; }
+  .sub .go { width:100%; margin-top:10px; background:var(--red); color:var(--canvas); border:0; padding:11px; font:inherit; font-style:italic; cursor:pointer; }
+  .sub .go:hover { background:var(--ink); }
+  .sub .x { position:absolute; top:8px; right:12px; background:none; border:0; font-size:26px; line-height:1; cursor:pointer; color:var(--ink); }
+
+  @media (max-width:560px) {
+    .nav { padding:14px 12px; }
+    .nav a { font-size:10px; letter-spacing:.5px; }
+    .nav .nav-right { gap:9px; }
+  }
+  @media (prefers-reduced-motion:reduce) { * { animation:none !important; scroll-behavior:auto !important; } }
+/* FIX FOR YOUR nav-right */
+.nav{
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:flex-start !important;
+}
+.nav-right{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-end !important;
+  gap:6px !important;
+}
+.nav-left a, .nav-right a{
+  color: white !important;
+  font-family: 'Courier Prime', monospace !important;
+  text-decoration: none !important;
+  font-weight: 700 !important;
+}
+.nav{
+  display: none !important;
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash" aria-hidden="true">
+  <p class="brand">TheQermez</p>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left"><a href="#">SEARCH</a></div>
+  <div class="nav-right">
+    <a href="#">CART</a>
+    <a href="#">MENU</a>
+    <a href="#">ABOUT</a>
+    <a href="#">LOGIN</a>
+  </div>
+</nav>
+
+<!-- MAIN PAGE -->
+<header class="hero">
+  <h1 class="sr-only">TheQermez</h1>
+  <div class="half left" id="heroart"></div>
+    <div class="half right"><p style="color: #fff8e7;">A little world of art, colour and creativity.</p>
+      <a class="cue" href="#choose" onclick="document.getElementById('choose').scrollIntoView({behavior:'smooth'}); return false;">Choose an edit below</a>
+  </div>
+  </header>
+
+<section class="choose" id="choose">
+  <p class="edit-tag">Two ways in</p>
+  <h2>Choose an edit.</h2>
+  <div class="doors">
+    <div class="door soon" aria-disabled="true"><span class="new">Coming soon</span><img class="ph" src="painted-4.png" alt="The Sticker Edit"><strong>The Sticker Edit</strong><span class="s">Three game bags, made as stickers.</span></div>
+    <a class="door" href="#painted"><img class="ph" src="painted-5.jpg" alt="Fabric painted bags"><strong>Fabric Painted</strong><span class="s">Hand-painted bags, made again on request.</span></a>
+  </div>
+</section>
+
+<section id="games">
+  <a class="back" href="#">Back to the front page</a>
+  <p class="edit-tag">New edit</p>
+  <h2>The sticker bags.</h2>
+  <p class="lede">A new edit of three games we grew up with, made as stickers. Each one comes with a small potli of spare pieces.</p>
+  <div class="games" id="grid"></div>
+</section>
+
+<section id="painted">
+  <a class="back" href="#">Back to the front page</a>
+  <p class="edit-tag">Hand painted</p>
+  <h2>Fabric painted bags.</h2>
+  <p class="lede">Each bag is painted by hand on cotton canvas, and can be painted again for you on request.</p>
+  <div class="painted-grid" id="pgrid"></div>
+</section>
+
+<section class="every" id="every">
+  <h2>On every bag.</h2>
+  <div class="items">
+    <div><b>One red stitch</b><span>A single red thread, the same on every bag.</span></div>
+    <div><b>A potli</b><span>Attached to the bag, finished with a parandi-style tassel.</span></div>
+    <div><b>An inside label</b><span>It carries the name of the design.</span></div>
+    <div><b>A design card</b><span>Explains the idea behind your bag.</span></div>
+  </div>
+</section>
+
+<section class="idea" id="idea">
+  <p>A little art in the everyday. 
+    
+    Made for the creatively curious.</p>
+</section>
+
+<footer>
+  <b>TheQermez</b>
+  <div class="flinks"><a href="#painted">Fabric Painted</a></div>
+  <div class="footer" style="display:flex; gap:24px; justify-content:center; color:white;">
+    <span>Contact us at:</span>
+    <a href="https://wa.me/9233324442466" style="color:white;">WhatsApp: +92 332 4442466</a>
+  </div>
+</footer>
+
+
+<form class="sub" id="subform">
+  <button type="button" class="x" aria-label="Close" onclick="this.closest('.sub').remove()">×</button>
+  <b>A letter from us</b>
+  <p>New games and first looks, sent rarely.</p>
+  <label>email <input type="email" name="entry.1885770749" required placeholder="name@gmail.com"></label>
+  <label>name <input type="text" name="entry.1857005214" placeholder="first name"></label>
+  <button class="go" type="submit">Subscribe</button>
+</form>
+
+<script>
+// ===== SPLASH: auto-hide after 2 seconds =====
+setTimeout(function () {
+  document.getElementById("splash").classList.add("hide");
+}, 2000);
+
+// make the splash name fit the screen width (hidden until sized, so no flicker)
+function fitBrand() {
+  var el = document.querySelector("#splash .brand");
+  el.style.fontSize = "100px";
+  el.style.fontSize = (100 * window.innerWidth * 0.6 / el.offsetWidth) + "px";
+  el.classList.add("ready");
+}
+document.fonts.load('300 100px "Cormorant Garamond"').then(fitBrand, fitBrand);
+setTimeout(fitBrand, 800);
+window.addEventListener("resize", fitBrand);
+
+// ===== EDIT THESE =====
+const WHATSAPP = "923324442466";           // your number: country code, no + or spaces
+const GAMES = [
+  { name:"Ludo", ur:"لڈو", price:4500, tint:"#e6d3b0",
+    theme:"The family game everyone fought over.",
+    potli:"Spare tokens and a die.",
+    card:"A pachisi-style cross painted in black and cream squares, with a flower at the centre. The four home circles are red, green, black and brass.",
+    art:"ludo" },
+  { name:"Chess", ur:"شطرنج", price:4500, tint:"#ecdcc0",
+    theme:"A strategy game with a royal, old-world feel.",
+    potli:"A few spare pieces.",
+    card:"A black and cream board framed by a painted border of small red flowers and crowns, like an old board. A king and queen sit beside it, with their names in calligraphy: <span class='ur'>شاہ</span> and <span class='ur'>وزیر</span>.",
+    art:"chess" },
+  { name:"Saanp seerhi", ur:"سانپ سیڑھی", price:4500, tint:"#e8cdb8",
+    theme:"Life’s ups and downs, in calligraphy.",
+    potli:"A die and tokens.",
+    card:"A grid board with black snakes and red ladders. The ladders carry <span class='ur'>ہمت</span> and <span class='ur'>محبت</span>; the snakes carry <span class='ur'>غصہ</span> and <span class='ur'>غرور</span>. The game becomes a lesson in lettering.",
+    art:"snake" }
+];
+// ======================
+
+const C = "#efe3c8", R = "#A3202C", K = "#000", G = "#2f5d3a", B = "#b8893b";
+const ART = {
+  ludo: u => `<svg viewBox="0 0 200 200" role="img" aria-label="Ludo board"><defs><pattern id="c${u}" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="${C}"/><rect width="10" height="10" fill="${K}"/><rect x="10" y="10" width="10" height="10" fill="${K}"/></pattern></defs>
+    <rect x="70" y="10" width="60" height="180" fill="url(#c${u})" stroke="${K}" stroke-width="2"/><rect x="10" y="70" width="180" height="60" fill="url(#c${u})" stroke="${K}" stroke-width="2"/>
+    <rect x="70" y="70" width="60" height="60" fill="${C}" stroke="${K}" stroke-width="2"/>
+    <circle cx="38" cy="38" r="24" fill="${R}"/><circle cx="162" cy="38" r="24" fill="${G}"/><circle cx="38" cy="162" r="24" fill="${K}"/><circle cx="162" cy="162" r="24" fill="${B}"/>
+    <g transform="translate(100 100)" fill="${R}">${[0,60,120,180,240,300].map(a => `<circle cy="-13" r="9" transform="rotate(${a})"/>`).join("")}<circle r="6" fill="${B}"/></g></svg>`,
+  chess: u => `<svg viewBox="0 0 200 200" role="img" aria-label="Chess board with king and queen"><defs><pattern id="k${u}" width="36" height="36" patternUnits="userSpaceOnUse"><rect width="36" height="36" fill="${C}"/><rect width="18" height="18" fill="${K}"/><rect x="18" y="18" width="18" height="18" fill="${K}"/></pattern></defs>
+    <rect x="14" y="46" width="108" height="108" fill="url(#k${u})"/>
+    <rect x="8" y="40" width="120" height="120" fill="none" stroke="${R}" stroke-width="4" stroke-dasharray="1 8" stroke-linecap="round"/>
+    <g fill="${K}"><path d="M140 154H156L158 128H138Z"/><circle cx="148" cy="120" r="7"/><path d="M168 154H184L186 128H166Z"/><circle cx="176" cy="120" r="6"/></g>
+    <path d="M148 100V112M143 105H153" stroke="${R}" stroke-width="3"/><g fill="${R}"><circle cx="170" cy="110" r="2.5"/><circle cx="176" cy="106" r="2.5"/><circle cx="182" cy="110" r="2.5"/></g></svg>`,
+  snake: u => `<svg viewBox="0 0 200 200" role="img" aria-label="Snakes and ladders board"><defs><pattern id="g${u}" x="20" y="20" width="32" height="32" patternUnits="userSpaceOnUse"><rect width="32" height="32" fill="none" stroke="${K}" stroke-opacity=".3"/></pattern></defs>
+    <rect x="20" y="20" width="160" height="160" fill="${C}"/><rect x="20" y="20" width="160" height="160" fill="url(#g${u})" stroke="${K}" stroke-width="2"/>
+    <path d="M150 34C108 38 172 78 122 92S64 128 96 166" fill="none" stroke="${K}" stroke-width="8" stroke-linecap="round"/><circle cx="150" cy="32" r="8" fill="${K}"/><path d="M155 28l8-4M155 35l8 3" stroke="${R}" stroke-width="2"/>
+    <g stroke="${R}" stroke-width="4" stroke-linecap="round"><path d="M42 170L72 96M58 174L88 100"/><path d="M52 150l16 6M58 134l16 6M65 118l16 6M71 102l16 6" stroke-width="3"/><path d="M36 76V42M52 76V42"/><path d="M36 68h16M36 58h16M36 48h16" stroke-width="3"/></g></svg>`,
+  ttt: u => `<svg viewBox="0 0 200 200" role="img" aria-label="Tic-tac-toe board with a row of hearts"><symbol id="h${u}" viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></symbol>
+    <path d="M70 24V176M130 24V176M24 70H176M24 130H176" stroke="${R}" stroke-width="6" stroke-linecap="round"/>
+    <g stroke="${K}" stroke-width="6" stroke-linecap="round" fill="${C}"><path d="M35 35L59 59M59 35L35 59M141 35L165 59M165 35L141 59M88 88L112 112M112 88L88 112"/><circle cx="100" cy="47" r="14"/><circle cx="47" cy="100" r="14"/><circle cx="153" cy="100" r="14"/></g>
+    <g fill="${R}"><use href="#h${u}" x="33" y="139" width="28" height="28"/><use href="#h${u}" x="86" y="139" width="28" height="28"/><use href="#h${u}" x="139" y="139" width="28" height="28"/></g></svg>`
+};
+
+const link = text => "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(text);
+document.getElementById("grid").innerHTML = GAMES.map((g, i) => `
+  <article class="game">
+    <div class="art" style="--tint:${g.tint}">${ART[g.art]("g" + i)}</div>
+    <div class="head"><h3>${g.name}</h3><span class="ur">${g.ur}</span></div>
+    <p class="theme">${g.theme}</p>
+    <p class="price">PKR ${g.price.toLocaleString("en-PK")}</p>
+    <details><summary>What’s in the potli, and the idea</summary>
+      <div class="body"><p><b>Potli:</b> ${g.potli}</p><p>${g.card}</p></div></details>
+    <a class="btn" href="${link("Hi! I’d like the " + g.name + " bag.")}">Order on WhatsApp</a>
+  </article>`).join("");
+document.querySelectorAll("[data-wa]").forEach(a => a.href = link("Hi! I’d like to order a bag."));
+</script>
+<style>
+  .half.right p { font-family:"Cormorant Garamond", Georgia, serif; font-style:italic; font-weight:400; font-size:clamp(35px,6vw,80px); line-height:1; max-width:12ch; }
+  
+  #grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.game { width:100%; min-width:0; }
+
+@media (max-width: 700px) {
+    #grid {
+      grid-template-columns: repeat(3, 1fr);
+    padding: 15px;
+  }
+}</style>
+<style>
+  .half.right .hero-line { font-family:"Cormorant Garamond", Georgia, serif; font-style:italic; font-weight:500; font-size:clamp(20px,3vw,28px);  line-height:1; min-height:1em; color:#f2e6cd; text-shadow:0 2px 18px rgba(0,0,0,.45); }
+  .caret { display:inline-block; width:2px; height:.8em; margin-left:4px; background:#ecc77a; vertical-align:-.05em; animation:blink 1s steps(1) infinite; }
+  .hero-line.fin .caret { animation:none; opacity:0; }
+  @keyframes blink { 50% { opacity:0; } }
+  .stitch-line { width:min(300px,62vw); height:12px; overflow:visible; clip-path:inset(0 100% 0 0); transition:clip-path 1s ease .1s; }
+  .stitch-line path { fill:none; stroke:#e04a3f; stroke-width:3; stroke-linecap:round; stroke-dasharray:11 9; }
+  .done .stitch-line { clip-path:inset(0 0 0 0); }
+  @media (prefers-reduced-motion:reduce) { .stitch-line { transition:none; } }
+  .stitch-line { display:none !important; }
+  </style>
+  <script>
+  (function () {
+    var WRONG = "Game over.";   // the mistake that gets deleted
+    var START = 2300;           // wait before typing, in milliseconds
+    var hero = document.querySelector(".half.right");
+    var p = hero.querySelector("p");
+    var FINAL = p.textContent.trim();   // your own line, read from the page
+    p.classList.add("hero-line");
+    p.setAttribute("aria-label", FINAL);
+    p.innerHTML = '<span class="typed" aria-hidden="true"></span><span class="caret" aria-hidden="true"></span>';
+    p.insertAdjacentHTML("afterend", '<svg class="stitch-line" viewBox="0 0 300 12" aria-hidden="true"><path d="M2 6H298"/></svg>');
+    var typed = p.querySelector(".typed"), skipped = false;
+    function finish() {
+      skipped = true;
+      typed.textContent = FINAL;
+      hero.classList.add("done");
+      setTimeout(function () { p.classList.add("fin"); }, 150);
+    }
+    function wait(ms) { return new Promise(function (r) { setTimeout(r, skipped ? 0 : ms); }); }
+    async function type(str) { for (var i = 0; i < str.length; i++) { if (skipped) return; typed.textContent += str[i]; await wait(65 + Math.random() * 55); } }
+    async function erase() { while (typed.textContent.length && !skipped) { typed.textContent = typed.textContent.slice(0, -1); await wait(32); } }
+    async function run() { await wait(START); await type(FINAL); finish(); }
+    document.addEventListener("click", finish, { once: true });
+    document.addEventListener("keydown", finish, { once: true });
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) finish(); else run();
+  })();
+  </script>
+<style>
+/* ===== two doors, two pages, sticker look, painted page ===== */
+/* which page is showing */
+#games, .every, #painted { display:none; }
+body[data-view="sticker"] #games, body[data-view="sticker"] .every { display:block; }
+body[data-view="painted"] #painted { display:block; }
+body[data-view="sticker"] .hero, body[data-view="sticker"] .idea, body[data-view="sticker"] .choose,
+body[data-view="painted"] .hero, body[data-view="painted"] .idea, body[data-view="painted"] .choose { display:none; }
+.back { display:block; width:max-content; margin-bottom:22px; color:var(--red); font-style:italic; }
+.flinks { display:flex; gap:22px; flex-wrap:wrap; align-items:center; }
+.flinks a { margin-right:0; }
+
+/* the two doors, in their own section below the first screen */
+.choose { padding-bottom:40px; }
+.doors { display:grid; grid-template-columns:1fr 1fr; gap:28px; max-width:900px; margin-top:28px; }
+.door { position:relative; display:flex; flex-direction:column; gap:10px; padding:14px; text-decoration:none; color:var(--ink); font-style:normal; border:2px solid var(--ink); background:#f6edd8; transition:background .25s, color .25s, transform .25s; }
+.door:hover, .door:focus-visible { background:var(--ink); color:#f2e6cd; transform:translateY(-4px); }
+.door .ph { display:flex; align-items:center; justify-content:center; aspect-ratio:4/3; border:2px dashed var(--red); color:var(--red); font-style:italic; background:repeating-linear-gradient(135deg, rgba(163,32,44,.07) 0 14px, transparent 14px 28px); }
+.door strong { font-family:"Cormorant Garamond", Georgia, serif; font-style:italic; font-weight:500; font-size:clamp(28px,3.4vw,42px); line-height:1.05; }
+.door .s { font-size:16px; line-height:1.4; }
+.door .new { position:absolute; top:-12px; right:-8px; z-index:2; padding:2px 12px; border-radius:999px; background:#ecc77a; color:#000; font-size:14px; font-style:italic; transform:rotate(4deg); }
+@media (max-width:600px) { .doors { grid-template-columns:1fr; } }
+
+/* small cue at the bottom of the first screen */
+.half.right { position:relative; }
+.cue { position:absolute; bottom:26px; left:0; right:0; text-align:center; text-decoration:none; opacity:0; transition:opacity .8s ease; }
+.half.right.done .cue, .cue.show { opacity:1; }
+
+/* sticker look for the three game bags */
+.edit-tag { display:inline-block; margin:0 0 14px; padding:4px 14px; border:2px solid var(--red); border-radius:999px; color:var(--red); background:#fffaf0; font-style:italic; transform:rotate(-2deg); }
+#grid { grid-template-columns:repeat(3,1fr); max-width:1200px; gap:56px 36px; padding:20px; }
+@media (max-width:900px) { #grid { grid-template-columns:1fr 1fr; } }
+@media (max-width:600px) { #grid { grid-template-columns:1fr; } .game:nth-child(even) { margin-top:0; } }
+.art { position:relative; background:var(--tint); border:10px solid #fffaf0; border-radius:26px; padding:14px; box-shadow:0 1px 0 rgba(0,0,0,.1), 0 16px 28px rgba(0,0,0,.2); transform:rotate(-2deg); transition:transform .25s ease; }
+.game:nth-child(2) .art { transform:rotate(2deg); }
+.game:nth-child(3) .art { transform:rotate(-1deg); }
+.game:hover .art { transform:rotate(0deg) translateY(-4px); }
+.art::after { content:""; position:absolute; right:-10px; bottom:-10px; width:58px; height:58px; background:linear-gradient(315deg, var(--canvas) 50%, #e6d9bb 50%); border-top-left-radius:16px; box-shadow:-5px -5px 10px rgba(0,0,0,.22); }
+
+/* painted bags page */
+.painted-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:44px 32px; max-width:1200px; }
+.pcard .pic { display:flex; align-items:center; justify-content:center; aspect-ratio:4/5; width:100%; border:2px dashed var(--red); color:var(--red); font-style:italic; background:repeating-linear-gradient(135deg, rgba(163,32,44,.07) 0 14px, transparent 14px 28px); }
+.pcard .kind { margin:14px 0 2px; color:var(--red); font-style:italic; }
+.pcard h3 { font-size:clamp(24px,2.6vw,32px); line-height:1.15; margin:0 0 6px; }
+.pcard p { margin:0 0 8px; }
+.pcard .made { font-size:15px; font-style:italic; opacity:.8; }
+@media (prefers-reduced-motion:reduce) { .art, .door, .cue { transition:none; } }
+</style>
+<script>
+// ===== PAINTED BAGS: edit these four (add or delete blocks as you like) =====
+const PAINTED = [
+{ photo:"painted-1.jpg", name:"Naqsh Tote", line:"A line about this painting goes here.", price:1800 },
+  { photo:"painted-2.jpg", name:"Wahda Tote", line:"A line about this painting goes here.", price:1200 },
+  { photo:"painted-3.jpg", name:"Zan Tote", line:"A line about this painting goes here.", price:1200 },
+  { photo:"painted-6.jpg", name:"Rani Tote", line:"A line about this painting goes here.", price:2000 }
+];
+document.getElementById("pgrid").innerHTML = PAINTED.map(function (b) {
+  return '<article class="pcard">' + (b.photo ? '<img class="pic" src="' + b.photo + '" alt="' + b.name + '">' : '<div class="pic">Photo goes here</div>') + '<p class="kind">Hand painted</p><h3>' + b.name + '</h3><p>' + b.line + '</p><p class="price">PKR ' + b.price.toLocaleString("en-PK") + '</p><p class="made">Made to order. Painted again for you on request.</p><a class="btn" href="' + link("Hi! I’d like the " + b.name + " bag.") + '">Order on WhatsApp</a></article>';
+}).join("");
+
+// ===== which page is showing: front, sticker, or painted =====
+function route() {
+  var h = location.hash.replace("#", "");
+  var view = (h === "painted") ? h : "home";   // the Sticker Edit is on hold, so #sticker shows the front page
+  var changed = document.body.dataset.view !== view;
+  document.body.dataset.view = view;
+  if (changed) window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+route();
+setTimeout(function () { document.querySelector(".cue").classList.add("show"); }, 7000);   // safety: doors always appear
+</script>
+<style>
+  .pcard img.pic { display:block; object-fit:cover; border:0; background:none; }
+  </style>
+  <style>
+    .door img.ph { display:block; width:100%; aspect-ratio:4/3; object-fit:cover; border:0; background:none; }
+    </style>
+<style>
+/* Sticker Edit on hold: Coming soon tile does nothing */
+.door.soon { cursor:default; }
+.door.soon:hover, .door.soon:focus-visible { background:#f6edd8; color:var(--ink); transform:none; }
+.flinks span { opacity:.85; }
+</style>
+<a id="wa-float" class="wa-float" href="#" aria-label="Chat on WhatsApp">Chat on WhatsApp</a>
+<style>
+.wa-float { position:fixed; left:28px; bottom:18px; z-index:50; padding:12px 18px; background:var(--red); color:#f2e6cd; font-style:italic; text-decoration:none; border:2px solid #f2e6cd; box-shadow:0 8px 20px rgba(0,0,0,.25); }
+.wa-float:hover { background:#000; }
+</style>
+<script>document.getElementById("wa-float").href = link("Hi! I have a question about your bags.");</script>
+<script>
+  document.getElementById("subform").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var form = this;
+    fetch("https://docs.google.com/forms/d/e/1FAIpQLSeP_rCiILKiq24qbig5NY4d0KeawK1vPD5JlGS97j5YOK7K3A/formResponse", { method: "POST", mode: "no-cors", body: new FormData(form) })
+    .then(function () {
+      form.innerHTML = "<b>Thank you.</b><p>We’ll write when something new is ready.</p>";
+      var x = document.createElement("button");
+      x.type = "button"; x.className = "x"; x.textContent = "×"; x.setAttribute("aria-label", "Close");
+      x.onclick = function () { form.remove(); };
+      form.appendChild(x);
+      setTimeout(function () { form.remove(); }, 6000);
+    })
+      .catch(function () { form.querySelector("p").textContent = "Something went wrong. Please try again."; });
+  });
+  </script>
+<style>
+  /* subscribe box: brass-gold so it stands out */
+  .sub { background:#ead4a5; }
+  .sub .go { background:#000; color:#f2e6cd; }
+  .sub .go:hover { background:var(--red); }
+  /* smaller WhatsApp button */
+  .wa-float { padding:9px 14px; font-size:15px; }
+  @media (max-width:600px) {
+    .wa-float { padding:6px 11px; font-size:13px; left:12px; bottom:12px; border-width:1.5px; }
+    .sub { left:12px; right:12px; width:auto; bottom:56px; padding:14px 16px 16px; }
+  }
+  </style>
+</body>
+</html>
